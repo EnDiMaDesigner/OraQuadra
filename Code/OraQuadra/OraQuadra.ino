@@ -1,13 +1,21 @@
-// OraQuadra V1.1
+// OraQuadra V1.0
 // By Davide Gatti SURVIVAL HACKING  www.survivalhacking.it
-//
+// Modified by En.Di.Ma.
+
+// 1. Modificati valori luminosità per lettere stampate in PETG trasparente
+// 2. Semplificata inizializzazione facendo rimanere soltanto l'effetto Rainbow
+// 3. Cancellata scritta Survival Hacking ed inserito testo EN DI MA
+// 4. Aggiunte definizioni 'SONOL' 'EORE' 'ORE' per intervallare le frasi di lettura su pannello
+// 5. Fissato colore bianco sul testo 'SONO LE ORE' 'E' 'MINUTI'
+// 6. Invertito ciclo IF che va a cambiare la luminosità giorno e notte.
+// 7. Corretto 'case 40' in 'AggiornaMinuti' che andava a colorare di rosso la lettera 'E' (ora rimosso)
+
 // Setup:
 //
 // Pulsante 1 = per la regolazione dell'ora
 // Pulsante 2 = per la regolazione deli minuti
 // Pulsante 1 + Pulsante 2 = cambio preset 0=Sfumato bianco  1-5=Scrittura lenta vari colori  6-10=Scrittira veloce vari colori
 //
-// Cambiati valori di luminosità di default per evitare che si bruci Arduino per l'eccessivo assorbimento della matrice LED 
 
 #include "RTClib.h"
 #include <Adafruit_NeoPixel.h>
@@ -18,11 +26,11 @@ RTC_DS3231 rtc;       // Istanza per usare l'RTC
 //Definizioni per neopixel
 #define PIN   4        // pin neopixel
 #define NUMPIXELS 256  // 16 x 16
-#define GIORNO 64     // Luminosità di giorno (Attenzione, non alzare troppo questo valore visto che la matrice è alimentata dall'arduino che potrebbe bruciarsi se esagerate)
-#define NOTTE 32       // Luminosità di notte
+#define GIORNO 30     // 64 Luminosità di girno
+#define NOTTE 4       // 32 Luminosità di notte
 
 Adafruit_NeoPixel strip(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
-int intBrightness;
+int intBrightness = 50; // Imposta la luminosità dei NeoPixel (0-255)
 
 //Definizione colori
 uint32_t Red = strip.Color(255, 0, 0); 
@@ -66,7 +74,11 @@ uint32_t Colore;        // Variabile per il passaggio colore
 
 //Definizione testi vari
 int  txtSONOLEORE[] = {15,14,13,12,10,9,7,6,5,-1};
-int  txtSURVIVAL[] = {11,8,4,0,19,23,31,41,37,52,57,63,73,66,64,-1};
+int  txtSONOLE[] = {15,14,13,12,10,9,-1};
+int  txtSONOL[] = {15,14,13,12,10,-1};
+int  txtEORE[] = {9,7,6,5,-1};
+int  txtORE[] = {7,6,5,-1};
+int  txtENDIMA[] = {43,52,75,84,107,41,42,74,73,105,106,103,88,71,56,39,57,69,100,91,68,59,36,144,175,176,207,208,145,173,178,205,209,148,171,180,203,212,215,200,183,168,151,167,166,154,165,186,197,218,220,195,188,163,157,158,160,191,192,223,190,189,-1};//{11,8,4,0,19,23,31,41,37,52,57,63,73,66,64,-1};
 int  txtMINUTI[] = {249,250,251,252,253,254,-1};
 
 //Definizione delle stringhe delle ore
@@ -127,85 +139,207 @@ void setup () {
   strip.begin();                          // inizializza matrice neo pixel
   strip.clear();                          // spegni tutti i led della matrice  
   rainbow(1);                             // faiun effetto arcobaleno
-  for (int i =0 ; i < 500; i++) {        // Scrivi SURVIVAL HACKING in multicolor e poi flash bianchi 
-    paintWordFast(random(254),strip.Color( random(254), random(254), random(254)));
-    strip.show();
-  }
-  
-  for (int i =0 ; i < 5; i++) {           // Scrivi SURVIVAL HACKING in multicolor e poi flash bianchi 
-    paintWordFast(txtSURVIVAL, Red);
-    paintWordFast(txtSURVIVAL, Blue);
-    paintWordFast(txtSURVIVAL, Yellow);
-    paintWordFast(txtSURVIVAL, Green);
-    paintWordFast(txtSURVIVAL, White);
-  }
-//  delay(1000);
-  for (int i =0 ; i < 100; i++) {        // Scrivi SURVIVAL HACKING in multicolor e poi flash bianchi 
-    paintWordFast(random(255),strip.Color(0,0,0));
-    paintWordFast(random(255),strip.Color(0,0,0));
-    paintWordFast(random(255),strip.Color(0,0,0));
-    paintWordFast(random(255),strip.Color(0,0,0));
-    paintWordFast(random(255),strip.Color(0,0,0));
-    paintWordFast(random(255),strip.Color(0,0,0));
-    paintWordFast(random(255),strip.Color(0,0,0));
-    paintWordFast(random(255),strip.Color(0,0,0));
-    paintWordFast(random(255),strip.Color(0,0,0));
-    paintWordFast(random(255),strip.Color(0,0,0));
-//    paintWordFast(txtSURVIVAL, Off);
-//    delay(1);
-//    paintWordFast(txtSURVIVAL, White);
-    strip.show();
-  }
   strip.clear();
   strip.show();
-  strip.setPixelColor(11,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(8,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(4,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(0,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(19,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(23,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(31,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(41,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(37,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(52,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(57,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(63,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(73,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(66,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(200);
-  strip.setPixelColor(64,White);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(1000);
-  paintWordFast(txtSURVIVAL, Red);
-  strip.show();                           // aggiorna matrice neopixel
-  delay(1000);
+
+//Lettera E
+strip.setPixelColor(43,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(52,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(75,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(84,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(107,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(41,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(42,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(74,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(73,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(105,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(106,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+
+//Lettera N
+strip.setPixelColor(103,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(88,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(71,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(56,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(39,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(57,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(69,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(100,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(91,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(68,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(59,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(36,Green);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+
+//Lettera D
+strip.setPixelColor(144,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(175,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(176,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(207,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(208,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(145,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(173,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(178,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(205,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(209,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+
+//Lettera I
+strip.setPixelColor(148,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(171,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(180,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(203,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(212,Yellow);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+
+//Lettera M
+strip.setPixelColor(215,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(200,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(183,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(168,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(151,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(167,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(166,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(154,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(165,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(186,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(197,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(218,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+
+//Lettera A
+strip.setPixelColor(220,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(195,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(188,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(163,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(157,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(158,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(160,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(191,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(192,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(223,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(190,Blue);
+strip.show();                           // aggiorna matrice neopixel
+delay(70);
+strip.setPixelColor(189,Blue);
+strip.show();                           // aggiorna matrice neopixel
+
+  delay(3000);
 
   strip.clear();                          // spegni tutti i led della matrice  
   strip.show();                           // aggiorna matrice neopixel
@@ -237,7 +371,7 @@ void loop () {
     int minuti = now.minute();
     ora+=1;                                 // incrementa ora 
     if (ora > 23 ) ora = 0;                 // controlla limiti 
-    rtc.adjust(DateTime(2024,10,18,ora,minuti,0)); // scrivi ora nell'RTC
+    rtc.adjust(DateTime(2024,12,7,ora,minuti,0)); // scrivi ora nell'RTC
     delay(100); 
     mode=2;                                 // imposta modalità aggiornamento led veloce 
   } else if(!digitalRead(P2)) {             // se si preme il pulsante M si regolano i minuti 
@@ -246,17 +380,17 @@ void loop () {
     int minuti = now.minute();
     minuti+=1;                              // incrementa minuti
     if (minuti > 59 ) minuti = 0;           // controlla limiti 
-    rtc.adjust(DateTime(2024,10,18,ora,minuti,0)); // scrivi ora nell'RTC
+    rtc.adjust(DateTime(2024,12,7,ora,minuti,0)); // scrivi ora nell'RTC
     delay(100);
     mode=2;                                 // imposta modalità aggiornamento led veloce 
   } else {
     mode=modo;                              // se non sono premuti tasti metti la modalità impostata dai Preset
   }
   DateTime now = rtc.now();               // leggi ora dall'RTC
-  if((now.hour() < 7) || (now.hour() >= 19)){  // se nella fascia oraria dalle 19 alle 7 abbassa la luminosità
-    intBrightness =  NOTTE;               // setta la luminosità notturna
-  } else {
+  if((now.hour() < 7) || (now.hour() >= 19)){  // se nella fascia oraria dalle 7 alle 19 alza la luminosità
     intBrightness =  GIORNO;              // setta la luminosità giorno
+  } else {
+    intBrightness =  NOTTE;               // setta la luminosità notturna
   }
   strip.setBrightness(intBrightness);     // imposta la luminosità nella matrice neopixel
   strip.show();                           // aggiorna la matrice
@@ -264,8 +398,21 @@ void loop () {
   minutocorrente = now.minute();          // imposta variabile locale dei minuti correnti
   oracorrente = now.hour();               // imposta variabile locale delle ore correnti
 
-  paintWord(txtSONOLEORE, Colore, mode);   // scrivi 'SONO LE ORE'
+  //condizione che va a scrivere "SONO L UNA", scrive durante il giorno "ORE", scrive la sera "SONO LE"
+  if((now.hour() == 1) || (now.hour() == 13)){ // se sono le 1 o le 13
+    paintWord(txtEORE, Off,mode);              // cancella 'SONO LE ORE'
+    paintWord(txtSONOL, White,mode);           // scrivi 'SONO L'
+  } else if((now.hour() < 0) || (now.hour() >= 12)){ // se si entra nell'intervallo dalle 0 alle 12
+    paintWord(txtORE, White, mode);            // scrivi 'ORE'
+    paintWord(txtSONOLE, Off,mode);            // cancella 'SONO LE'
+  } else {
+    paintWord(txtSONOLE, White, mode);        // scrivi 'SONO LE'
+    paintWord(txtORE, Off,mode);               // cancella 'ORE'
+  }
+  
+  strip.show();
 
+  //paintWord(txtSONOLEORE, Colore, mode);   // scrivi 'SONO LE ORE'
 
   if (oracorrente != oraprecedente) {     // verifica se + cambiata l'ora
     AggiornaOre(oraprecedente,Off,2);     // cancella l'ora precedente
@@ -280,14 +427,15 @@ void loop () {
       paintWord(txtE, Off,2);                     // cancella "E"
       paintWord(txtMINUTI, Off,2);                // cancella "MINUTI"
     } else {
-      paintWord(txtE, Colore,mode);               // Se minuti <> 0 scrivi "E"
+      paintWord(txtE, White,mode);               // Se minuti <> 0 scrivi "E"
       AggiornaMinuti(minutocorrente,Colore,mode); // scrivi i minuti correnti
-      paintWord(txtMINUTI, Colore,mode);          // Se minuti <> 0 scrivi "MINUTI"
+      paintWord(txtMINUTI, White,mode);          // Se minuti <> 0 scrivi "MINUTI"
     }
     minutoprecedente=minutocorrente;              // imposta l'ora precedente
     strip.show();                                 // aggiorna la matrice
   }  
   strip.show();                                   // aggiorna la matrice
+
   delay(500);                                     // attesa di un secondo per far pulsare la scritta se in modalità 0
 }
 
@@ -358,7 +506,7 @@ void AggiornaOre(int ora,uint32_t Colore, int modo) { // in base all'ora passata
       paintWord(txtDODOCI, Colore, modo);
       break;
     case 1:
-    case 13:
+    case 13:      
       paintWord(txtUNA, Colore, modo);
       break;
     case 2:
@@ -546,7 +694,7 @@ void AggiornaMinuti(int minuti, uint32_t Colore, int modo) { // in base alminuto
       paintWord(txtMNOVE, Colore, modo);
       break;
     case 40:
-      paintWord(txtE, Colore, modo);
+      //(paintWord(txtE, Colore, modo);
       paintWord(txtMQUARANTA, Colore, modo);
       break;
     case 41:
@@ -667,7 +815,7 @@ void paintWordSlow(int arrWord[], uint32_t intColor){     // scrittura nella mat
     } else {
       strip.setPixelColor(arrWord[i],intColor);
       strip.show();
-      delay(25);
+      delay(50);
     }
   }
 }
@@ -709,7 +857,6 @@ void rainbow(uint8_t wait) {                // accendi tutto il display con un a
     delay(wait);
   }
 }
-
 
 
 uint32_t Wheel(byte WheelPos) {             // calcola il colore nel formato HUE
